@@ -5,6 +5,7 @@ import csv
 
 
 def onepage():
+    # Get page, iterate through products, get discount, amount and title, add to CSV
     r1 = requests.get(url, params=payload)
     time.sleep(1)
     rj1 = r1.json()
@@ -15,23 +16,25 @@ def onepage():
             amo = rj1['products'][i]['price']['amount']
             name = rj1['products'][i]['title']
             root.writerow([name, disc, amo])
+    # Instead of a progress bar, print timestamp once each page is done
     print(payload['page'] + ' ' + str(datetime.datetime.now()))
 
 
 def site(tn):
-    for i in range(1, tn+1):
+    # Iterate through the pages and call onepage to process each one
+    for i in range(1, tn + 1):
         payload['page'] = str(i)
         onepage()
 
 
-# Prepare: Url, Params, Get first page json, Get total number of pages, open file
+# Prepare: Url, Params, Get first page json, Get total number of pages, open file, write CSV header
 url = 'https://www.gog.com/public_wishlist/975863384196/search'
 payload = {'hiddenFlag': '0', 'mediaType': '0', 'sortBy': 'title', 'page': '1'}
 r = requests.get(url, params=payload)
 time.sleep(1)
 rj = r.json()
 total = rj['totalPages']
-f = open('wishlist.csv', 'w', encoding='utf-8')
+f = open(r'E:\Downloads\wishlist.csv', 'w', encoding='utf-8')
 root = csv.writer(f)
 root.writerow(['Name', 'Discount', 'Amount'])
 site(total)
