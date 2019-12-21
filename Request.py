@@ -8,8 +8,8 @@ def onepage():
     r1 = requests.get(url, params=payload)
     time.sleep(1)
     rj1 = r1.json()
-    l = len(rj1['products'])
-    for i in range(l):
+    lg = len(rj1['products'])
+    for i in range(lg):
         t1 = rj1['products'][i]['title']
         f.write(t1 + '\n')
     print(payload['page'] + ' ' + str(datetime.datetime.now()))
@@ -28,18 +28,10 @@ r = requests.get(url, params=payload)
 time.sleep(1)
 rj = r.json()
 total = rj['totalPages']
-f = open('file.txt', 'w', encoding='utf-8')
+f = open(r'E:\Downloads\file.txt', 'w', encoding='utf-8')
 site(total)
 f.close()
 
-# print(payload['page'])
-# soup object
-# rsoup = BeautifulSoup(resp.text, 'html.parser')
-# temp = rsoup.find_all(text=True)
-# output = ''
-# for t in rsoup:
-#     output += '{} '.format(t)
-# f.write(output)
-# f.close()
+
 if __name__ == '__main__':
     print('done')

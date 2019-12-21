@@ -15,6 +15,7 @@ def onepage():
             disc = rj1['products'][i]['price']['discountPercentage']
             amo = rj1['products'][i]['price']['amount']
             name = rj1['products'][i]['title']
+            name = name.replace(',', '')  # fix for removing commas which mess up the CSV import
             root.writerow([name, disc, amo])
     # Instead of a progress bar, print timestamp once each page is done
     print(payload['page'] + ' ' + str(datetime.datetime.now()))
@@ -34,7 +35,7 @@ r = requests.get(url, params=payload)
 time.sleep(1)
 rj = r.json()
 total = rj['totalPages']
-f = open(r'E:\Downloads\wishlist.csv', 'w', encoding='utf-8')
+f = open(r'E:\Downloads\wishlist.csv', 'w', encoding='utf-8', newline='')
 root = csv.writer(f)
 root.writerow(['Name', 'Discount', 'Amount'])
 site(total)
