@@ -1,0 +1,2 @@
+python WishlistExport.py
+pause
