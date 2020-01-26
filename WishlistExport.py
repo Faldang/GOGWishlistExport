@@ -55,7 +55,7 @@ def get_conf():
     return ret_name, ret_path
 
 
-# Prepare: Config, Url, Params, Get first page json, Get total number of pages, open file, write CSV header
+# Prepare: Config, Url, Params, Get first page JSON, Get total number of pages, open file, write CSV header
 f_name, f_path = get_conf()
 f_id = getuserid(f_name)
 url = 'https://www.gog.com/public_wishlist/' + f_id + '/search'
