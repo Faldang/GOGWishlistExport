@@ -1,9 +1,7 @@
 # GOGWishlistExport
 Script to export discounted games from a GOG Wishlist to a CSV file. Useful when deciding what to buy during large sales
 
-Wishlist must be viewable by everyone in order for the script to work. Only discounted items are exported.
-
-TODO: if no items are currently wishlisted, the script should export the whole wishlist
+Wishlist must be viewable by everyone in order for the script to work. Only discounted items are exported, if at least one item is discounted. If no items are currently discounted, the script exports the whole wishlist
 
 To use it, edit dudeId.txt: first line should be your GOG profile name, and the second line should be the folder path where you want the CSV saved.
 After that, run WishlistExport.py
