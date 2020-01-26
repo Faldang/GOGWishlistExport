@@ -22,28 +22,26 @@ def getuserid(name):
     return tid
 
 
-def onepage():
-    # Get page, iterate through products, get discount, amount and title, add to CSV
-    r1 = requests.get(url, params=payload)
-    time.sleep(1)
-    rj1 = r1.json()
-    lg = len(rj1['products'])
-    for i in range(lg):
-        if rj1['products'][i]['isDiscounted']:
-            disc = rj1['products'][i]['price']['discountPercentage']
-            amo = rj1['products'][i]['price']['amount']
-            name = rj1['products'][i]['title']
-            name = name.replace(',', '')  # fix for removing commas which mess up the CSV import
-            root.writerow([name, disc, amo])
-    # Instead of a progress bar, print timestamp once each page is done
-    print(payload['page'] + ' ' + str(datetime.datetime.now()))
-
-
 def site(tn):
-    # Iterate through the pages and call onepage to process each one
-    for i in range(1, tn + 1):
-        payload['page'] = str(i)
-        onepage()
+    # Iterate through the pages and get discount, amount and title, add to list
+    export_iter = []
+    for i1 in range(1, tn + 1):
+        payload['page'] = str(i1)
+        r1 = requests.get(url, params=payload)
+        time.sleep(1)
+        rj1 = r1.json()
+        lg = len(rj1['products'])
+        for x in range(lg):
+            # if rj1['products'][x]['isDiscounted']:
+            disc = rj1['products'][x]['price']['discountPercentage']
+            amo = rj1['products'][x]['price']['amount']
+            name = rj1['products'][x]['title']
+            name = name.replace(',', '')  # fix for removing commas which mess up the CSV import
+            # format is name, discount, amount
+            export_iter.append([name, disc, amo])
+        # Instead of a progress bar, print timestamp once each page is done
+        print(payload['page'] + ' ' + str(datetime.datetime.now()))
+    return export_iter
 
 
 def get_conf():
@@ -55,20 +53,64 @@ def get_conf():
     return ret_name, ret_path
 
 
-# Prepare: Config, Url, Params, Get first page JSON, Get total number of pages, open file, write CSV header
+def csv_with_discount(flist):
+    # Take full list, open file, set header
+    f = open(f_path + 'wishlist.csv', 'w', encoding='utf-8', newline='')
+    root = csv.writer(f)
+    root.writerow(['Name', 'Discount', 'Amount'])
+    # Write each row in file
+    for i2 in range(len(flist)):
+        if flist[i2][1] != 0:
+            name = flist[i2][0]
+            disc = flist[i2][1]
+            amo = flist[i2][2]
+            root.writerow([name, disc, amo])
+    f.close()
+
+
+def csv_no_discount(flist):
+    # Take full list, open file, set header
+    f = open(f_path + 'wishlist.csv', 'w', encoding='utf-8', newline='')
+    root = csv.writer(f)
+    root.writerow(['Name', 'Amount'])
+    # Write each row in file
+    for i3 in range(len(flist)):
+        name = flist[i3][0]
+        amo = flist[i3][2]
+        root.writerow([name, amo])
+    f.close()
+
+
+# Prepare: Config, userId
 f_name, f_path = get_conf()
 f_id = getuserid(f_name)
+
+# Prepare: URL, get first page, get total number of pages
 url = 'https://www.gog.com/public_wishlist/' + f_id + '/search'
 payload = {'hiddenFlag': '0', 'mediaType': '0', 'sortBy': 'title', 'page': '1'}
 r = requests.get(url, params=payload)
 time.sleep(1)
 rj = r.json()
 total = rj['totalPages']
-f = open(f_path + 'wishlist.csv', 'w', encoding='utf-8', newline='')
-root = csv.writer(f)
-root.writerow(['Name', 'Discount', 'Amount'])
-site(total)
-f.close()
+
+# Export a full List of the wishlist, set flag
+export = site(total)
+export_flag = True
+# testflag = False
+
+# Go through the list and if there are any discounted items, make file
+for i in range(len(export)):
+    # if testflag:
+    if export[i][1] != 0:
+        export_flag = False
+        csv_with_discount(export)
+        print("Discount exists, list of discounted items exported")
+        break
+
+# If there are no discounted items, make file differently
+if export_flag:
+    csv_no_discount(export)
+    print("No discounts currently, full list exported")
 
 # https://www.gog.com/public_wishlist/975863384196/search?hiddenFlag=0&mediaType=0&page=1&sortBy=title
 
