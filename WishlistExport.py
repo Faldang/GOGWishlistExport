@@ -23,7 +23,7 @@ def getuserid(name):
 
 
 def site(tn):
-    # Iterate through the pages and get discount, amount and title, add to list
+    # Iterate through the pages and get discount, amount, title and type, add to list
     export_iter = []
     for i1 in range(1, tn + 1):
         payload['page'] = str(i1)
@@ -36,9 +36,10 @@ def site(tn):
             disc = rj1['products'][x]['price']['discountPercentage']
             amo = rj1['products'][x]['price']['amount']
             name = rj1['products'][x]['title']
+            item_type = rj1['products'][x]['type']
             name = name.replace(',', '')  # fix for removing commas which mess up the CSV import
-            # format is name, discount, amount
-            export_iter.append([name, disc, amo])
+            # format is name, discount, amount, type
+            export_iter.append([name, disc, amo, item_type])
         # Instead of a progress bar, print timestamp once each page is done
         print(payload['page'] + ' ' + str(datetime.datetime.now()))
     return export_iter
@@ -57,14 +58,15 @@ def csv_with_discount(flist):
     # Take full list, open file, set header
     f = open(f_path + 'wishlist.csv', 'w', encoding='utf-8', newline='')
     root = csv.writer(f)
-    root.writerow(['Name', 'Discount', 'Amount'])
+    root.writerow(['Name', 'Discount', 'Amount', 'Type'])
     # Write each row in file
     for i2 in range(len(flist)):
         if flist[i2][1] != 0:
             name = flist[i2][0]
             disc = flist[i2][1]
             amo = flist[i2][2]
-            root.writerow([name, disc, amo])
+            item_type = flist[i2][3]
+            root.writerow([name, disc, amo, item_type])
     f.close()
 
 
@@ -72,12 +74,13 @@ def csv_no_discount(flist):
     # Take full list, open file, set header
     f = open(f_path + 'wishlist.csv', 'w', encoding='utf-8', newline='')
     root = csv.writer(f)
-    root.writerow(['Name', 'Amount'])
+    root.writerow(['Name', 'Amount', 'Type'])
     # Write each row in file
     for i3 in range(len(flist)):
         name = flist[i3][0]
         amo = flist[i3][2]
-        root.writerow([name, amo])
+        item_type = flist[i3][3]
+        root.writerow([name, amo, item_type])
     f.close()
 
 
